@@ -6,6 +6,7 @@ class ArticleFetcherWorker
       "https://says.com/my/rss" => "SAYS",
       "https://www.hmetro.com.my/feed" => "Harian Metro",
       "https://www.eatdrinkkl.com/posts.atom" => "Eat Drink KL"
+      # "https://www.freemalaysiatoday.com/feed/" => "Free Malaysia Today"
     }
 
     publishers.each do |url, name|
