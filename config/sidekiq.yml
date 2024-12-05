@@ -1,0 +1,10 @@
+:concurrency: 5
+
+:queues:
+  - default
+  - critical
+  - low
+
+article_fetcher:
+  cron: "0 * * * *" # Every hour
+  class: ArticleFetcherWorker
