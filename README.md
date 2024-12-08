@@ -26,6 +26,7 @@ Things you may want to cover:
 - Enqueue the worker (in rails console)
   `rails console`
   `ArticleFetcherWorker.perform_async`
+  `ArticleFetcherWorker.new.perform`
 
 - start redis server
   `redis-server`

@@ -15,9 +15,9 @@ class Crawler
     publisher.update(language: "EN") if publisher.language.blank?
 
     response = HTTParty.get(@feed_url)
-    if resnpose.success?
+    if response.success?
       Rails.logger.info "Feed fetched successfully for #{@feed_url}"
-      Rails.logger.debug "Feed resnpose body: #{response.body[0..500]}"
+      Rails.logger.debug "Feed response body: #{response.body[0..500]}"
     else
       Rails.logger.error "Failed to fetch feed for #{@feed_url}. Response code: #{response.code}"
       return
@@ -50,7 +50,7 @@ class Crawler
 
   # rss feeds
   def process_rss(doc)
-    items doc.xpath("//item")
+    items = doc.xpath("//item")
     Rails.logger.info "Found #{items.size} items in rss feed"
 
     items.each_with_index do |item, index|
@@ -127,7 +127,7 @@ class Crawler
   end
 
   def extract_first_image(html_content)
-    if html_content
+    if html_content.blank?
       Rails.logger.warn "No HTML content to extract img from"
       return nil
     end
@@ -140,30 +140,33 @@ class Crawler
   end
 
   def categorize(title, publisher)
-    # Lowercase the title once to simplify multiple keyword checks
+    keyword_mapping = {
+      "World" => /\b(world|international|global|overseas|abroad)\b/i,
+      "Food" => /\b(food|recipe|cuisine|restaurant|eat|drink|cafe|dining)\b/i,
+      "Sports" => /\b(sports|football|soccer|basketball|tennis|cricket|athletics|olympics)\b/i,
+      "Technology" => /\b(tech|technology|software|hardware|ai|robotics|gadgets|innovation)\b/i,
+      "Entertainment" => /\b(entertainment|movie|music|tv|celebrity|hollywood|bollywood)\b/i,
+      "Politics" => /\b(politics|election|government|policy|minister|parliament)\b/i
+    }
+
+    # default categories
+    publisher_defaults = {
+      "Eat Drink KL" => "Food",
+      "SAYS" => "News",
+      "Harian Metro" => "News"
+    }
+
+    # Check the publisher has a predefined category
+    return publisher_defaults[publisher] if publisher_defaults.key?(publisher)
+
     normalized_title = title.downcase
 
-    # Publishers and logic
-    case publisher
-    when "Eat Drink KL"
-      # All Eat Drink KL articles go to 'Food' by default
-      "Food"
-    when "SAYS", "Harian Metro"
-      # Check if the title contains keywords that imply international scope
-      if normalized_title.match(/\b(world|international|global|overseas|abroad)\b/)
-        "World"
-      else
-        # Otherwise, treat it as local news
-        "News"
-      end
-    else
-      # For any other publisher, check the title similarly
-      if normalized_title.match(/\b(world|international|global|overseas|abroad)\b/)
-        "World"
-      else
-        # Default category if no keywords are found
-        "News"
-      end
+    # match title against keyword mappings
+    keyword_mapping.each do |category, regex|
+      return category if normalized_title.match?(regex)
     end
+
+    # no match is found
+    "News"
   end
 end
