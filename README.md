@@ -1,7 +1,8 @@
 # README
 
-- Services (job queues, cache servers, search engines, etc.)
-  scrape with sidekiq
+# 1. Services (job queues, cache servers, search engines, etc.)
+
+scrape with sidekiq
 
 - Run cron job
   `bundle exec sidekiq`
@@ -16,7 +17,7 @@
 - The perform method is responsible for fetching articles from various sources and processing them accordingly.
   `ArticleFetcherWorker.new.perform`
 
-## Redis
+## 2. Redis
 
 - start redis server
   `redis-server`
@@ -24,7 +25,7 @@
 - stop redis server
   `redis-cli shutdown`
 
-## How to clear data in db
+## 3. How to clear data in db
 
 - Clear db in rails console
 
@@ -34,12 +35,23 @@
   Publisher.destroy_all
 
   # Reset auto-increment IDs
-  ActiveRecord::Base.connection.reset_pk_sequence!('articles')
-  ActiveRecord::Base.connection.reset_pk_sequence!('publishers')
+  ActiveRecord::Base.connection.reset_sequence!('articles', 'id')
+  ActiveRecord::Base.connection.reset_sequence!('publishers', 'id')
+
   ```
 
-TODO:
+## 4. Endpoint
 
-1. The app should be able to filter the articles by language (English / BM).
-2. Your code should be able to easily handle any new addition of publishers.
-3. The app should allow one to see a list of the publishers as well (not just a hardcoded list).
+- Endpoints:
+
+  GET /articles
+  GET /articles/:id
+  GET /publishers
+  GET /publishers/:id
+
+- Supported Parameters:
+
+For GET /articles: language (optional, e.g., ?language=EN or ?language=BM)
+For GET /articles/:id: :id (required)
+For GET /publishers: no additional parameters
+For GET /publishers/:id: :id (required)
