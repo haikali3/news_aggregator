@@ -1,35 +1,42 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-- Ruby version
-
-- System dependencies
-
-- Configuration
-
-- Database creation
-
-- Database initialization
-
-- How to run the test suite
-
 - Services (job queues, cache servers, search engines, etc.)
   scrape with sidekiq
 
 - Run cron job
   `bundle exec sidekiq`
 
-- check console
+- Enqueue the worker (in rails console)
   `rails console`
+
+- Run worker
+  `ArticleFetcherWorker.perform_async`
+
+- This line of code creates a new instance of the ArticleFetcherWorker class and calls its perform method.
+- The perform method is responsible for fetching articles from various sources and processing them accordingly.
+  `ArticleFetcherWorker.new.perform`
+
+## Redis
 
 - start redis server
   `redis-server`
 
-- Deployment instructions
+- stop redis server
+  `redis-cli shutdown`
+
+## How to clear data in db
+
+- Clear db in rails console
+
+  ```
+  # Clear all data
+  Article.destroy_all
+  Publisher.destroy_all
+
+  # Reset auto-increment IDs
+  ActiveRecord::Base.connection.reset_pk_sequence!('articles')
+  ActiveRecord::Base.connection.reset_pk_sequence!('publishers')
+  ```
 
 TODO:
 
