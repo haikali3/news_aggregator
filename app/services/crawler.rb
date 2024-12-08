@@ -10,9 +10,15 @@ class Crawler
   def fetch_articles
     Rails.logger.info "Starting fetch for feed: #{@feed_url}, publisher: #{@publisher_name}"
 
-    publisher = Publisher.find_or_create_by(name: @publisher_name)
-    Rails.logger.info "Publisher: #{publisher.name} (ID: #{publisher.id})"
+  publisher = Publisher.find_or_create_by(name: @publisher_name)
+  Rails.logger.info "Publisher: #{publisher.name} (ID: #{publisher.id})"
+
+  # Force Harian Metro publisher language to BM
+  if publisher.name == "Harian Metro"
+    publisher.update(language: "BM")
+  else
     publisher.update(language: "EN") if publisher.language.blank?
+  end
 
     response = HTTParty.get(@feed_url)
     if response.success?
