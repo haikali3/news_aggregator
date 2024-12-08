@@ -23,8 +23,9 @@ Things you may want to cover:
 - Run cron job
   `bundle exec sidekiq`
 
-- check console
+- Enqueue the worker (in rails console)
   `rails console`
+  `ArticleFetcherWorker.perform_async`
 
 - start redis server
   `redis-server`
