@@ -51,7 +51,7 @@ scrape with sidekiq
 
 - Supported Parameters:
 
-For GET /articles: language (optional, e.g., ?language=EN or ?language=BM)
-For GET /articles/:id: :id (required)
-For GET /publishers: no additional parameters
-For GET /publishers/:id: :id (required)
+  For GET /articles: language (optional, e.g., ?language=EN or ?language=BM)
+  For GET /articles/:id: :id (required)
+  For GET /publishers: no additional parameters
+  For GET /publishers/:id: :id (required)
