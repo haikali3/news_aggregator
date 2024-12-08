@@ -57,7 +57,10 @@ class Crawler
       title = item.at("title")&.text
       link = item.at("link")&.text
       published_date = item.at("pubDate")&.text
-      main_image = item.at("media|thumbnail")&.[]("url") || item.at("media|content")&.[]("url")
+
+      # Handle media:thumbnail with namespace-aware lookup
+      media_thumbnail = item.at_xpath("media:thumbnail", "media" => "http://search.yahoo.com/mrss/")&.[]("url")
+      main_image = media_thumbnail || item.at_xpath("media:content", "media" => "http://search.yahoo.com/mrss/")&.[]("url")
 
       Rails.logger.info "Processing RSS item ##{index + 1}: title=#{title}, link=#{link}, published_date=#{published_date}, main_image=#{main_image}"
 
@@ -134,7 +137,7 @@ class Crawler
 
     doc = Nokogiri::HTML(html_content)
     img = doc.at("img")
-    img&.[]("src")
+    image_src = img&.[]("src")
     Rails.logger.info "Extracted image source: #{image_src}"
     image_src
   end
