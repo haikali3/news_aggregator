@@ -19,10 +19,14 @@ Things you may want to cover:
 
 - Services (job queues, cache servers, search engines, etc.)
   scrape with sidekiq
+
+- Run cron job
   `bundle exec sidekiq`
 
+- check console
   `rails console`
 
+- start redis server
   `redis-server`
 
 - Deployment instructions

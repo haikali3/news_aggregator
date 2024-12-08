@@ -14,12 +14,15 @@ class Crawler
     response = HTTParty.get(@feed_url)
     doc = Nokogiri::XML(response.body)
 
+    # so atom feed can be parsed with simple xpaths
+    doc.remove_namespaces!
+
     if doc.at("rss")
       Rails.logger.info "Processing RSS feed for #{@feed_url}"
       process_rss(doc)
     elsif doc.at("feed")
       Rails.logger.info "Processing Atom feed for #{@feed_url}"
-      Rails.logger.info "Feed Content: #{doc.to_xml}"
+      # Rails.logger.info "Feed Content: #{doc.to_xml}"
       process_atom(doc)
     else
       Rails.logger.error "Unknown feed format for #{@feed_url}"
@@ -47,18 +50,23 @@ class Crawler
   # atom feeds
   def process_atom(doc)
     doc.xpath("//entry").each do |entry|
-      # Extract link (construct absolute URL if necessary)
+      # Handle relative links
       link = entry.at("link[rel='alternate']")&.[]("href")
       link = URI.join(@feed_url, link).to_s if link && !link.start_with?("http")
 
-      # Extract main image from <content> (first <img> tag)
+      # Parse the content HTML for images and additional info
       content_html = entry.at("content")&.text
       main_image = extract_first_image(content_html)
 
+      # Extract required fields
+      title = entry.at("title")&.text
+      published_date = entry.at("published")&.text || entry.at("updated")&.text
+
+      # Process the article
       process_article(
-        title: entry.at("title")&.text,
+        title: title,
         link: link,
-        published_date: entry.at("published")&.text || entry.at("updated")&.text,
+        published_date: published_date,
         main_image: main_image
       )
     end
@@ -87,10 +95,10 @@ class Crawler
   end
 
   def extract_first_image(html_content)
-    return if html_content.blank?
+    return nil if html_content.blank?
 
     doc = Nokogiri::HTML(html_content)
-    img = doc.at("img") # Get the first <img> tag
+    img = doc.at("img")
     img&.[]("src")
   end
 
